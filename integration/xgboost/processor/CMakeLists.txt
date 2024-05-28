@@ -18,14 +18,10 @@ target_include_directories(proc_nvflare PRIVATE ${proc_nvflare_SOURCE_DIR}/src/i
         ${XGB_SRC}/include
         ${XGB_SRC}/dmlc-core/include)
 
-link_directories(${XGB_SRC}/lib/)
-
 if (APPLE)
     add_link_options("LINKER:-object_path_lto,$<TARGET_PROPERTY:NAME>_lto.o")
     add_link_options("LINKER:-cache_path_lto,${CMAKE_BINARY_DIR}/LTOCache")
 endif ()
-
-target_link_libraries(proc_nvflare ${XGB_SRC}/lib/libxgboost${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 #-- Unit Tests
 if(GOOGLE_TEST)
