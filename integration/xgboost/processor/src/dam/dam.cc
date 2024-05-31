@@ -27,15 +27,14 @@ void print_buffer(uint8_t *buffer, int size) {
 
 // DamEncoder ======
 void DamEncoder::AddFloatArray(const std::vector<double> &value) {
-    if (encoded) {
-        std::cout << "Buffer is already encoded" << std::endl;
-        return;
-    }
-    auto buf_size = value.size()*8;
-    uint8_t *buffer = static_cast<uint8_t *>(malloc(buf_size));
-    memcpy(buffer, value.data(), buf_size);
-    // print_buffer(reinterpret_cast<uint8_t *>(value.data()), value.size() * 8);
-    entries->push_back(new Entry(kDataTypeFloatArray, buffer, value.size()));
+  if (encoded) {
+    std::cout << "Buffer is already encoded" << std::endl;
+    return;
+  }
+  auto buf_size = value.size() * 8;
+  uint8_t *buffer = static_cast<uint8_t *>(malloc(buf_size));
+  memcpy(buffer, value.data(), buf_size);
+  entries->push_back(new Entry(kDataTypeFloatArray, buffer, value.size()));
 }
 
 void  DamEncoder::AddIntArray(const std::vector<int64_t> &value) {
@@ -115,18 +114,19 @@ bool DamDecoder::IsValid() {
 }
 
 std::vector<int64_t> DamDecoder::DecodeIntArray() {
-    auto type = *reinterpret_cast<int64_t *>(pos);
-    if (type != kDataTypeIntArray) {
-        std::cout << "Data type " << type << " doesn't match Int Array" << std::endl;
-        return std::vector<int64_t>();
-    }
-    pos += 8;
+  auto type = *reinterpret_cast<int64_t *>(pos);
+  if (type != kDataTypeIntArray) {
+    std::cout << "Data type " << type << " doesn't match Int Array"
+              << std::endl;
+    return std::vector<int64_t>();
+  }
+  pos += 8;
 
-    auto len = *reinterpret_cast<int64_t *>(pos);
-    pos += 8;
-    auto ptr = reinterpret_cast<int64_t *>(pos);
-    pos += 8*len;
-    return std::vector<int64_t>(ptr, ptr + len);
+  auto len = *reinterpret_cast<int64_t *>(pos);
+  pos += 8;
+  auto ptr = reinterpret_cast<int64_t *>(pos);
+  pos += 8 * len;
+  return std::vector<int64_t>(ptr, ptr + len);
 }
 
 std::vector<double> DamDecoder::DecodeFloatArray() {

@@ -185,6 +185,7 @@ class XGBController(Controller):
         Returns: None
 
         """
+        print("[nvflare]: update client status")
         with self.status_lock:
             peer_ctx = fl_ctx.get_peer_context()
             if not peer_ctx:
@@ -489,6 +490,7 @@ class XGBController(Controller):
         for c, cs in self.client_statuses.items():
             assert isinstance(cs, ClientStatus)
             if not cs.started_time:
+                print("[nvflare]: appending failed client:", cs)
                 failed_clients.append(c)
 
         # if any client failed to start, terminate the job
@@ -584,12 +586,15 @@ class XGBController(Controller):
 
         rc = result.get_return_code()
         if rc == ReturnCode.OK:
+            print("[nvflare]: client OK")
             self.log_info(fl_ctx, f"successfully started client {client_name}")
             cs = self.client_statuses.get(client_name)
+            print("[nvflare]: status:", cs)
             if cs:
                 assert isinstance(cs, ClientStatus)
                 cs.started_time = time.time()
         else:
+            print("[nvflare]: client not OK")
             self.log_error(fl_ctx, f"client {client_name} failed to start")
 
     def _check_job_status(self, fl_ctx: FLContext) -> bool:

@@ -15,6 +15,7 @@ import os
 
 import xgboost as xgb
 from xgboost import callback
+import numpy as np
 
 from nvflare.apis.fl_component import FLComponent
 from nvflare.apis.fl_context import FLContext
@@ -72,7 +73,7 @@ class XGBClientRunner(AppRunner, FLComponent):
             if not isinstance(self._metrics_writer, LogWriter):
                 self.system_panic("writer should be type LogWriter", fl_ctx)
 
-    def _xgb_train(self, params: XGBoostParams, train_data, val_data) -> xgb.core.Booster:
+    def _xgb_train(self, params: XGBoostParams, train_data: xgb.DMatrix, val_data) -> xgb.core.Booster:
         """XGBoost training logic.
 
         Args:
@@ -83,6 +84,8 @@ class XGBClientRunner(AppRunner, FLComponent):
         """
         # Specify validations set to watch performance
         watchlist = [(val_data, "eval"), (train_data, "train")]
+        y = train_data.get_label()
+        print("[nvflare]: unique y:", np.unique(y), y.shape, train_data.get_data().shape)
 
         callbacks = [callback.EvaluationMonitor(rank=self._rank)]
         if self._metrics_writer:

@@ -32,10 +32,10 @@ class NVFlareProcessor: public processing::Processor {
     bool active_ = false;
     const std::map<std::string, std::string> *params_;
     std::vector<double> *gh_pairs_{nullptr};
-    std::vector<uint32_t> cuts_;
+    std::vector<uint32_t> cuts_;  // cut pointer
     std::vector<int> slots_;
     bool feature_sent_ = false;
-    std::vector<int64_t> features_;
+    std::vector<int64_t> features_;  // the feature index
 
  public:
     void Initialize(bool active, std::map<std::string, std::string> params) override {
@@ -52,20 +52,31 @@ class NVFlareProcessor: public processing::Processor {
     void FreeBuffer(void *buffer) override {
         free(buffer);
     }
+    // Encode the gpair
+    void *ProcessGHPairs(size_t *size,
+                         const std::vector<double> &pairs) override;
+    // assign buf_size to size
+    void *HandleGHPairs(size_t *size, void *buffer, size_t buf_size) override;
 
-    void* ProcessGHPairs(size_t *size, const std::vector<double>& pairs) override;
-
-    void* HandleGHPairs(size_t *size, void *buffer, size_t buf_size) override;
-
-    void InitAggregationContext(const std::vector<uint32_t> &cuts, const std::vector<int> &slots) override {
-        if (this->slots_.empty()) {
-            this->cuts_ = std::vector<uint32_t>(cuts);
-            this->slots_ = std::vector<int>(slots);
-        } else {
-            std::cout << "Multiple calls to InitAggregationContext" << std::endl;
-        }
+    void InitAggregationContext(const std::vector<uint32_t> &cuts,
+                                const std::vector<int> &slots) override {
+      if (this->slots_.empty()) {
+        this->cuts_ = std::vector<uint32_t>(cuts);
+        this->slots_ = std::vector<int>(slots);
+      } else {
+        // is this an error?
+        std::cout << "Multiple calls to InitAggregationContext" << std::endl;
+      }
     }
 
+    /*!
+     * \brief Prepare row set for aggregation
+     *
+     * \param size The output buffer size
+     * \param nodes Map of node and the rows belong to this node
+     *
+     * \return The encoded buffer to be sent via AllGatherV
+     */
     void *ProcessAggregation(size_t *size, std::map<int, std::vector<int>> nodes) override;
 
     std::vector<double> HandleAggregation(void *buffer, size_t buf_size) override;

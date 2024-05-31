@@ -69,7 +69,9 @@ class SecurityContentManager(object):
         """
         full_path = os.path.join(self.content_folder, file_under_verification)
         data = None
+        print("[nvflare]: full_path:", full_path)
         if not os.path.exists(full_path):
+            print("[nvflare]: no such content")
             return data, LoadResult.NO_SUCH_CONTENT
 
         with open(full_path, "rb") as f:
@@ -77,6 +79,7 @@ class SecurityContentManager(object):
         if not data:
             return data, LoadResult.NO_SUCH_CONTENT
 
+        print("[nvflare]: after file read")
         if self.valid_config and file_under_verification in self.signature:
             signature = self.signature[file_under_verification]
             try:
@@ -91,6 +94,7 @@ class SecurityContentManager(object):
                 result = LoadResult.INVALID_SIGNATURE
         else:
             result = LoadResult.NOT_SIGNED
+        print(f"[nvflare] load_content: return {result}")
         return data, result
 
 

@@ -374,8 +374,10 @@ class ClientSecurityHandler(SecurityHandler):
                 if tenseal_imported:
                     self.tenseal_context = load_tenseal_context_from_workspace(self.tenseal_context_file, fl_ctx)
                 else:
+                    print("Tenseal module not loaded, horizontal secure XGBoost is not supported")
                     self.debug(fl_ctx, "Tenseal module not loaded, horizontal secure XGBoost is not supported")
             except Exception as ex:
+                print(f"[nvflare] Can't load tenseal context, horizontal secure XGBoost is not supported: {ex}, {self.tenseal_context_file}")
                 self.debug(fl_ctx, f"Can't load tenseal context, horizontal secure XGBoost is not supported: {ex}")
                 self.tenseal_context = None
         elif event_type == EventType.END_RUN:

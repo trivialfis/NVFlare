@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 #pragma once
-#include <string>
 #include <vector>
-#include <map>
+#include <cstdint>  // for int64_t
+#include <cstddef>  // for size_t
 
 const char kSignature[] = "NVDADAM1";  // DAM (Direct Accessible Marshalling) V1
 const int kPrefixLen = 24;

@@ -38,9 +38,12 @@ def load_tenseal_context_from_workspace(ctx_file_name: str, fl_ctx: FLContext):
         bad_rcs.extend([LoadResult.INVALID_SIGNATURE, LoadResult.NOT_SIGNED])
 
     if rc in bad_rcs:
+        print(f"[nvflare]: raise, rc: {rc}")
         raise ValueError("Cannot load tenseal_context {}: {}".format(ctx_file_name, rc))
 
+    print("[nvflare]: context from")
     context = ts.context_from(data)
+    print("[nvflare] got context")
     return context
 
 
